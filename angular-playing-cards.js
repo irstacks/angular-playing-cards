@@ -116,11 +116,30 @@ playingCards.directive('playingCard', function($compile, $sce) {
         scope: {},
         restrict: 'E',
         link: function(scope, element, attrs) {
-            scope.rank = ranks[attrs.rank] || ranks.back;
-            scope.suit = suits[attrs.suit] || suits.heart;
-            element.replaceWith($compile(scope.rank.template)(scope));
+            console.log('attrs.rank', attrs.rank);
+            console.log('attrs.suit', attrs.suit);
+            var currentElement = element;
+
+            // listen for changes in interpolate string changes in attrs, ie <playing-card rank="{{ card.rank }}"" suit="{{ card.suit }}" />
+            attrs.$observe('rank', function (value) {
+             console.log(value);
+             scope.rank = ranks[value] || ranks.back;
+             scope.suit = suits[attrs.suit] || suits.heart;
+             var replacementElement = $compile(scope.rank.template)(scope); // apply the changes
+             currentElement.replaceWith(replacementElement);
+             currentElement = replacementElement;
+            });
+
+            attrs.$observe('suit', function (value) {
+             console.log(value);
+             scope.rank = ranks[attrs.rank] || ranks.back;
+             scope.suit = suits[value] || suits.heart;
+             var replacementElement = $compile(scope.rank.template)(scope); // apply the changes
+             currentElement.replaceWith(replacementElement);
+             currentElement = replacementElement;
+            });
         }
-    };
+     };
 });
 
 
